@@ -25,10 +25,35 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+  className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+>
+  <div style={{ display: "flex", minHeight: "100vh" }}>
+    
+    {/* Sidebar */}
+    <aside
+      style={{
+        width: "220px",
+        background: "#111",
+        color: "white",
+        padding: "20px",
+      }}
+    >
+      <h2 style={{ fontWeight: 700, marginBottom: 20 }}>AI CRM</h2>
+
+      <nav style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <a href="/">Dashboard</a>
+        <a href="/deals">Deals</a>
+        <a href="/tasks">Tasks</a>
+      </nav>
+    </aside>
+
+    {/* Main content area */}
+    <main style={{ flex: 1, padding: "24px" }}>
+      {children}
+    </main>
+
+  </div>
+</body>
     </html>
   );
 }
