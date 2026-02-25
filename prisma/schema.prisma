@@ -79,6 +79,8 @@ model Contact {
 
 model Engagement {
   id                String           @id @default(cuid())
+  prototypeSource   String?
+  prototypeKey      String?
   bucket            EngagementBucket
   product           String?
   source            String?
@@ -113,6 +115,7 @@ model Engagement {
   @@index([bucket])
   @@index([dealStage])
   @@index([lastTouchAt])
+  @@unique([prototypeSource, prototypeKey])
 }
 
 model Task {

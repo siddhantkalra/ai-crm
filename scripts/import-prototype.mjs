@@ -18,6 +18,20 @@ function parseLooseDate(s) {
 
   return null;
 }
+function buildPrototypeKey(bucket, item) {
+  const base = [
+    bucket,
+    item.name || "",
+    item.contact || "",
+    item.product || "",
+    item.stage || item.status || "",
+  ]
+    .join("|")
+    .toLowerCase()
+    .trim();
+
+  return base;
+}
 
 function mapDealStage(stage) {
   const x = (stage || "").toLowerCase().trim();
@@ -100,8 +114,16 @@ async function main() {
       companyId: company.id,
     });
 
-    await prisma.engagement.create({
-      data: {
+    const prototypeKey = buildPrototypeKey("ACCOUNT", a); // or DEAL / LEAD
+
+    await prisma.engagement.upsert({
+      where: {
+        prototypeSource_prototypeKey: {
+          prototypeSource: "crm.html",
+          prototypeKey,
+        },
+      },
+      update: {
         bucket: "ACCOUNT",
         companyId: company.id,
         primaryContactId: contact.id,
@@ -114,8 +136,22 @@ async function main() {
         accountStatus: mapAccountStatus(a.status),
         billingSchedule: a.billingSchedule || null,
       },
-    });
-  }
+      create: {
+        prototypeSource: "crm.html",
+        prototypeKey,
+        bucket: "ACCOUNT",
+        companyId: company.id,
+        primaryContactId: contact.id,
+        product: a.product || null,
+        source: a.source || null,
+        notes: [a.notes, importTag].filter(Boolean).join("\n"),
+        nextStep: a.nextStep || null,
+        followUpRequired: !!a.followUpRequired,
+        lastTouchAt: parseLooseDate(a.lastContact),
+        accountStatus: mapAccountStatus(a.status),
+        billingSchedule: a.billingSchedule || null,
+    },
+  });
 
   // DEALS -> Engagement bucket DEAL
   for (const d of deals) {
@@ -126,8 +162,16 @@ async function main() {
       companyId: company.id,
     });
 
-    await prisma.engagement.create({
-      data: {
+    const prototypeKey = buildPrototypeKey("DEAL", a); 
+
+await prisma.engagement.upsert({
+  where: {
+    prototypeSource_prototypeKey: {
+      prototypeSource: "crm.html",
+      prototypeKey,
+    },
+  },
+  update: {
         bucket: "DEAL",
         companyId: company.id,
         primaryContactId: contact.id,
@@ -139,8 +183,22 @@ async function main() {
         lastTouchAt: parseLooseDate(d.lastContact),
         dealStage: mapDealStage(d.stage),
       },
-    });
-  }
+      create: {
+        prototypeSource: "crm.html",
+        prototypeKey,
+        bucket: "DEAL",
+        companyId: company.id,
+        primaryContactId: contact.id,
+        product: a.product || null,
+        source: a.source || null,
+        notes: [a.notes, importTag].filter(Boolean).join("\n"),
+        nextStep: a.nextStep || null,
+        followUpRequired: !!a.followUpRequired,
+        lastTouchAt: parseLooseDate(a.lastContact),
+        accountStatus: mapAccountStatus(a.status),
+        billingSchedule: a.billingSchedule || null,
+    },
+  });
 
   // LEADS -> Engagement bucket LEAD
   for (const l of leads) {
@@ -151,8 +209,16 @@ async function main() {
       companyId: company.id,
     });
 
-    await prisma.engagement.create({
-      data: {
+    const prototypeKey = buildPrototypeKey("LEAD", a);
+
+await prisma.engagement.upsert({
+  where: {
+    prototypeSource_prototypeKey: {
+      prototypeSource: "crm.html",
+      prototypeKey,
+    },
+  },
+  update: {
         bucket: "LEAD",
         companyId: company.id,
         primaryContactId: contact.id,
@@ -160,8 +226,22 @@ async function main() {
         source: l.source || null,
         notes: [l.notes, importTag].filter(Boolean).join("\n"),
       },
-    });
-  }
+      create: {
+        prototypeSource: "crm.html",
+        prototypeKey,
+        bucket: "LEAD",
+        companyId: company.id,
+        primaryContactId: contact.id,
+        product: a.product || null,
+        source: a.source || null,
+        notes: [a.notes, importTag].filter(Boolean).join("\n"),
+        nextStep: a.nextStep || null,
+        followUpRequired: !!a.followUpRequired,
+        lastTouchAt: parseLooseDate(a.lastContact),
+        accountStatus: mapAccountStatus(a.status),
+        billingSchedule: a.billingSchedule || null,
+    },
+  });
 
   console.log("✅ Import complete.");
 }
