@@ -94,3 +94,21 @@ This system is designed for a single operator workflow first, with architectural
 - Import pipeline hardened
 - Project documentation started
 
+
+## Day 2 – API Fix and Validation
+
+### What We Did
+- Fixed Next.js 15+ dynamic route params issue in `app/api/engagements/[id]/route.ts`
+- Implemented correct `await params` pattern for PATCH handler
+- Successfully tested PATCH endpoint via curl
+- Confirmed database updates through Prisma + Postgres
+- Committed and pushed changes to GitHub (`main`)
+
+### Where We Stopped
+- Confirmed dashboard lives in `app/page.tsx`
+- Frontend inline updates not wired yet
+
+### Next Step (Day 3)
+- Add inline checkbox in dashboard
+- Connect checkbox to PATCH endpoint
+- Update UI state from API response
