@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireApiKey } from "@/lib/apiAuth";
 
 function jsonError(message: string, status: number, details?: unknown) {
   const includeDetails = process.env.NODE_ENV !== "production";
@@ -10,9 +11,12 @@ function jsonError(message: string, status: number, details?: unknown) {
 }
 
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authError = requireApiKey(req);
+  if (authError) return authError;
+
   const { id } = await params;
 
   if (!id) {
